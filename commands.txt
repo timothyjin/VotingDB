@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS Candidate(
     ethnicity VARCHAR(20),
     party VARCHAR(30),
     PRIMARY KEY(SSN));
-CREATE TABLE IF NOT EXISTS ConsitutentOf(
+CREATE TABLE IF NOT EXISTS ConstituentOf(
     SSN CHAR(10),
     year YEAR,
     number INT NOT NULL,
@@ -48,17 +48,22 @@ CREATE TABLE IF NOT EXISTS ConsitutentOf(
     PRIMARY KEY(SSN, year),
     FOREIGN KEY(SSN) REFERENCES Voter(SSN),
     FOREIGN KEY(year) REFERENCES District(year));
-CREATE TABLE IF NOT EXISTS LocatedInDistrict(
-    position VARCHAR(50),
-    number INT NOT NULL,
-    state CHAR(2) NOT NULL,
-    PRIMARY KEY(position),
-    FOREIGN KEY(position) REFERENCES Election(position));
-CREATE TABLE IF NOT EXISTS LocatedInYear(
+CREATE TABLE IF NOT EXISTS ConstituentOf(
+    SSN CHAR(10),
+    year YEAR,
+    number INT,
+    state CHAR(2),
+    PRIMARY KEY(SSN, year),
+    FOREIGN KEY(SSN) REFERENCES Voter(SSN),
+    FOREIGN KEY(year, number, state) REFERENCES District(year, number, state));
+CREATE TABLE IF NOT EXISTS LocatedIn(
     position VARCHAR(50),
     year YEAR,
-    PRIMARY KEY(position, year),
-    FOREIGN KEY(position, year) REFERENCES Election(position, year));
+    number INT,
+    state CHAR(2),
+    PRIMARY KEY(position, year, number, state),
+    FOREIGN KEY(position, year) REFERENCES Election(position, year),
+    FOREIGN KEY(year, number, state) REFERENCES District(year, number, state));
 CREATE TABLE IF NOT EXISTS Casts(
     position VARCHAR(50),
     year YEAR,
@@ -67,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Casts(
     FOREIGN KEY(position, year) REFERENCES Election(position, year),
     FOREIGN KEY(ID) REFERENCES Ballot(ID));
 CREATE TABLE IF NOT EXISTS RunsOn(
-    position VARCHAR(50),
+position VARCHAR(50),
     year YEAR,
     SSN CHAR(10),
     ID BIGINT,

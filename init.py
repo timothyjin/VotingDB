@@ -61,6 +61,42 @@ candidates = [
 ('283746928', 'John', 'Tyler', 'McMaster', '1972-07-23', 'M', 'Caucasian', None)
 ]
 
+constituents = [
+('847364857', 2020, 1, 'OH'),
+('847364857', 2016, 1, 'OH'),
+('048739615', 2020, 1, 'OH'),
+('958305816', 2020, 3, 'OH'),
+('047630571', 2020, 1, 'MO'),
+('856821148', 2020, 1, 'MO'),
+('946740385', 2020, 3, 'OH'),
+('024836182', 2020, 2, 'OH')
+]
+
+locatedIn = [
+('Ohio 3rd District Representative', 2020, 3, 'OH'),
+('Senator from Missouri', 2020, 1, 'MO'),
+('Governor of Ohio', 2020, 1, 'OH'),
+('Governor of Ohio', 2020, 2, 'OH'),
+('Governor of Ohio', 2020, 3, 'OH'),
+('Ohio 1st District Representative', 2016, 1, 'OH')
+]
+
+casts = [
+('Ohio 3rd District Representative', 2020, 1),
+('Senator from Missouri', 2020, 2),
+('Ohio 1st District Representative', 2016, 3),
+('Ohio 3rd District Representative', 2020, 4),
+('Governor of Ohio', 2020, 5)
+]
+
+runsOn = [
+('Ohio 3rd District Representative', 2020, '846398465', 1, 0),
+('Senator from Missouri', 2020, '057380482', 2, 1),
+('Ohio 3rd District Representative', 2020, '736498562', 4, 1),
+('Ohio 1st District Representative', 2016, '287461948', 3, 1),
+('Governor of Ohio', 2020, '283746928', 5, 1)
+]
+
 
 connection = driver.connect(user=user, password=passwd, database=db_name)
 cursor = connection.cursor()
@@ -75,6 +111,10 @@ cursor.executemany('INSERT INTO District VALUES (%s, %s, %s, %s, %s)', districts
 cursor.executemany('INSERT INTO Election VALUES (%s, %s, %s, %s)', elections)
 cursor.executemany('INSERT INTO Ballot VALUES (%s, %s, %s, %s, %s)', ballots)
 cursor.executemany('INSERT INTO Candidate VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', candidates)
+cursor.executemany('INSERT INTO ConstituentOf VALUES (%s, %s, %s, %s)', constituents)
+cursor.executemany('INSERT INTO LocatedIn VALUES (%s, %s, %s, %s)', locatedIn)
+cursor.executemany('INSERT INTO Casts VALUES (%s, %s, %s)', casts)
+cursor.executemany('INSERT INTO RunsOn VALUES (%s, %s, %s, %s, %s)', runsOn)
 connection.commit()
 
 # close the connection
