@@ -1,0 +1,78 @@
+CREATE TABLE IF NOT EXISTS Voter(
+    SSN CHAR(10),
+    name_first VARCHAR(20) NOT NULL,
+    name_middle VARCHAR(20),
+    name_last VARCHAR(20) NOT NULL,
+    birthday DATE NOT NULL,
+    gender VARCHAR(10),
+    ethnicity VARCHAR(20),
+    income INT,
+    party VARCHAR(30),
+    PRIMARY KEY(SSN));
+CREATE TABLE IF NOT EXISTS District(
+    year YEAR,
+    number INT,
+    state CHAR(2),
+    population INT,
+    median_income INT,
+    PRIMARY KEY(year, number, state));
+CREATE TABLE IF NOT EXISTS Election(
+    position VARCHAR(50),
+    year YEAR,
+    month INT NOT NULL,
+    day INT NOT NULL,
+    PRIMARY KEY(position, year));
+CREATE TABLE IF NOT EXISTS Ballot(
+    ID BIGINT,
+    position VARCHAR(50),
+    year YEAR,
+    submission_time TIME NOT NULL,
+    absentee BOOL NOT NULL,
+    PRIMARY KEY(ID, year, position),
+    FOREIGN KEY(position, year) REFERENCES Election(position, year));
+CREATE TABLE IF NOT EXISTS Candidate(
+    SSN CHAR(10),
+    name_first VARCHAR(20) NOT NULL,
+    name_middle VARCHAR(20),
+    name_last VARCHAR(20) NOT NULL,
+    birthday DATE NOT NULL,
+    gender VARCHAR(10),
+    ethnicity VARCHAR(20),
+    party VARCHAR(30),
+    PRIMARY KEY(SSN));
+CREATE TABLE IF NOT EXISTS ConsitutentOf(
+    SSN CHAR(10),
+    year YEAR,
+    number INT NOT NULL,
+    state CHAR(2) NOT NULL,
+    PRIMARY KEY(SSN, year),
+    FOREIGN KEY(SSN) REFERENCES Voter(SSN),
+    FOREIGN KEY(year) REFERENCES District(year));
+CREATE TABLE IF NOT EXISTS LocatedInDistrict(
+    position VARCHAR(50),
+    number INT NOT NULL,
+    state CHAR(2) NOT NULL,
+    PRIMARY KEY(position),
+    FOREIGN KEY(position) REFERENCES Election(position));
+CREATE TABLE IF NOT EXISTS LocatedInYear(
+    position VARCHAR(50),
+    year YEAR,
+    PRIMARY KEY(position, year),
+    FOREIGN KEY(position, year) REFERENCES Election(position, year));
+CREATE TABLE IF NOT EXISTS Casts(
+    position VARCHAR(50),
+    year YEAR,
+    ID BIGINT,
+    PRIMARY KEY(position, year, ID),
+    FOREIGN KEY(position, year) REFERENCES Election(position, year),
+    FOREIGN KEY(ID) REFERENCES Ballot(ID));
+CREATE TABLE IF NOT EXISTS RunsOn(
+    position VARCHAR(50),
+    year YEAR,
+    SSN CHAR(10),
+    ID BIGINT,
+    vote_for BOOL NOT NULL,
+    PRIMARY KEY(position, year, SSN, ID),
+    FOREIGN KEY(position, year) REFERENCES Election(position, year),
+    FOREIGN KEY(SSN) REFERENCES Candidate(SSN),
+    FOREIGN KEY(ID) REFERENCES Ballot(ID));
