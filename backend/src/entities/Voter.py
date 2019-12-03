@@ -6,7 +6,7 @@ from marshmallow import Schema, fields
 class Voter(Entity, Base):
     __tablename__ = 'voter'
 
-    SSN = Column(Integer, primary_key=True)
+    SSN = Column(String, primary_key=True)
     name = Column(String)
     birthday = Column(Date)
     gender = Column(String)
@@ -25,7 +25,7 @@ class Voter(Entity, Base):
         self.party = party
 
 class VoterSchema(Schema):
-    SSN = fields.Number()
+    SSN = fields.Str()
     name = fields.Str()
     birthday = fields.DateTime()
     gender = fields.Str()
