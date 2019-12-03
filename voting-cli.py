@@ -138,6 +138,23 @@ def attribute_values(method):
     return values
 
 
+help_info = """
+Create_*:
+Enter relevant attribute values when prompted.
+Any attribute values left blank will be NULL in the database.
+
+Update_*:
+Enter relevant attribute values when prompted.
+Any attribute values left blank will remain the same as before.
+
+Custom_Query:
+Enter a valid SQL query command.
+The results of that query will be displayed.
+
+Enter 0 to save all changes and exit program.
+Enter Ctrl+C to abort all changes and exit program.
+"""
+
 options = {
     1: Create_Voter,
     2: Create_Ballot,
@@ -154,10 +171,14 @@ while True:
 
     for key in options:
         print(f'{key}. {options[key].__name__}')
-    print('0. Exit')
+    print('9. Help')
+    print('0. Save & Exit')
     choice = int(input('> '))
 
-    if choice == 0:
+    if choice == 9:
+        print(help_info)
+        continue
+    elif choice == 0:
         break
     elif choice not in options:
         print('Not a valid option.')
