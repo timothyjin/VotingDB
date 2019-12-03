@@ -46,10 +46,10 @@ elections = [
 ]
 
 ballots = [
-(1, 'Governor of Ohio', 2020, '9:00', 1),
-(2, 'Governor of Ohio', 2020, '15:00', 0),
-(3, 'Governor of Ohio', 2020, '12:30', 0),
-(4, 'Governor of Ohio', 2020, '19:00', 0),
+(1, 'Ohio 3rd District Representative', 2020, '9:00', 1),
+(2, 'Senator from Missouri', 2020, '15:00', 0),
+(3, 'Ohio 1st District Representative', 2016, '12:30', 0),
+(4, 'Ohio 3rd District Representative', 2020, '19:00', 0),
 (5, 'Governor of Ohio', 2020, '10:15', 0)
 ]
 

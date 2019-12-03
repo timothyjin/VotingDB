@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS Voter(
-    SSN CHAR(10),
+    SSN CHAR(9),
     name_first VARCHAR(20) NOT NULL,
     name_middle VARCHAR(20),
     name_last VARCHAR(20) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Ballot(
     PRIMARY KEY(ID, year, position),
     FOREIGN KEY(position, year) REFERENCES Election(position, year));
 CREATE TABLE IF NOT EXISTS Candidate(
-    SSN CHAR(10),
+    SSN CHAR(9),
     name_first VARCHAR(20) NOT NULL,
     name_middle VARCHAR(20),
     name_last VARCHAR(20) NOT NULL,
@@ -41,15 +41,7 @@ CREATE TABLE IF NOT EXISTS Candidate(
     party VARCHAR(30),
     PRIMARY KEY(SSN));
 CREATE TABLE IF NOT EXISTS ConstituentOf(
-    SSN CHAR(10),
-    year YEAR,
-    number INT NOT NULL,
-    state CHAR(2) NOT NULL,
-    PRIMARY KEY(SSN, year),
-    FOREIGN KEY(SSN) REFERENCES Voter(SSN),
-    FOREIGN KEY(year) REFERENCES District(year));
-CREATE TABLE IF NOT EXISTS ConstituentOf(
-    SSN CHAR(10),
+    SSN CHAR(9),
     year YEAR,
     number INT,
     state CHAR(2),
