@@ -45,7 +45,22 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
             print(f"Vote on candidate {v[0]} has been recorded")
 
 
-def Update_Voter():
+def Update_Voter(SSN: str, first_name=None, middle_name=None, last_name=None, birthday=None, gender=None, ethnicity=None, income=None, party=None):
+    atrs = [first_name, middle_name, last_name, birthday, gender, ethnicity, income, party]
+    sql_command = f"""SELECT * FROM Voter WHERE Voter.SSN = "{SSN}";"""
+    execute(sql_command)
+    for idx, a in enumerate(atrs):
+        if a is None:
+            a = cursor[idx]
+            atrs[idx] = a
+
+
+    sql_command = f"""UPDATE Voter 
+    SET Voter.name_first = "{atrs[0]}", 
+    Voter.name_middle = "{atrs[1]}", 
+    Voter.name_last = "{atrs[2]}", 
+     
+    WHERE Voter.SSN = "{SSN}";"""
     pass
 
 
@@ -59,7 +74,7 @@ def Find_Candidates(position, year):
     return cursor
 
 
-def Find_Election_Winner():
+def Find_Election_Winner(position, year):
     pass
 
 
