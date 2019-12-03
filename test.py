@@ -75,7 +75,14 @@ def Find_Candidates(position, year):
 
 
 def Find_Election_Winner(position, year):
-    pass
+    sql_command = f"""
+    SELECT RunsOn.vote_for, Candidate.name_first, Candidate.name_last, Candidate.party
+    FROM Candidate NATURAL JOIN RunsOn
+    WHERE RunsOn.position = "{position}" AND RunsOn.year = {year}
+    ORDER BY RunsOn.vote_for DESC;
+    """
+    execute(sql_command)
+    return cursor
 
 
 def Participation_Rate(position, year, number, state):
