@@ -13,12 +13,6 @@ connection = driver.connect(user=user, password=passwd, database=db_name)
 cursor = connection.cursor()
 
 
-def Find_Candidates(position, year):
-    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position = "{position}" AND RunsOn.year = {year};"""
-    execute(sql_command)
-    return cursor
-
-
 def Create_Voter(SSN, first_name, middle_name, last_name, birthday, gender, ethnicity, income, party):
     sql_command = f"""INSERT INTO Voter VALUES ("{SSN}", "{first_name}", "{middle_name}", "{last_name}", "{birthday}", "{gender}", "{ethnicity}", {income}, "{party}");"""
     status = execute(sql_command)
@@ -31,7 +25,7 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
     votes = []
     print('(Hit enter without input to stop reading votes for candidates...)')
     while True:
-        cand_vote = str(input('<candidate_SSN> <vote_for (1 for yes, 0 for no)>: '))
+        cand_vote = str(input('<candidate_SSN> <vote_for (yes: 1, no: 0)>: '))
         if not cand_vote:
             break
         votes.append(cand_vote)
@@ -49,6 +43,24 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
         status = execute(sql_command)
         if status:
             print(f"Vote on candidate {v[0]} has been recorded")
+
+
+def Update_Voter():
+    pass
+
+
+def Update_Candidate():
+    pass
+
+
+def Find_Candidates(position, year):
+    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position = "{position}" AND RunsOn.year = {year};"""
+    execute(sql_command)
+    return cursor
+
+
+def Find_Election_Winner():
+    pass
 
 
 def Participation_Rate(position, year, number, state):
@@ -86,28 +98,24 @@ def attribute_values(method):
     return values
 
 
-menu = """
-1. Insert voter
-2. Insert ballot
-3. Find candidates
-4. Find election winner
-5. Get participation rate
-6. Custom SQL query
-0. Exit
-> """
-
 options = {
     1: Create_Voter,
     2: Create_Ballot,
-    3: Find_Candidates, #('Senator from Missouri', 2020)
-    4: None, # Find election winner
-    5: Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
-    6: Custom_Query
+    3: Update_Voter,
+    4: Update_Candidate,
+    5: Find_Candidates, #('Senator from Missouri', 2020)
+    6: Find_Election_Winner,
+    7: Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
+    8: Custom_Query
 }
 
 # Main program loop
 while True:
-    choice = int(input(menu))
+
+    for key in options:
+        print(f'{key}. {options[key].__name__}')
+    print('0. Exit')
+    choice = int(input('> '))
 
     if choice == 0:
         break
