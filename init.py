@@ -68,7 +68,7 @@ constituents = [
 ('958305816', 2020, 3, 'OH'),
 ('047630571', 2020, 1, 'MO'),
 ('856821148', 2020, 1, 'MO'),
-('946740385', 2020, 3, 'OH'),
+('946740385', 2016, 1, 'OH'),
 ('024836182', 2020, 2, 'OH')
 ]
 
@@ -82,11 +82,11 @@ locatedIn = [
 ]
 
 casts = [
-('Ohio 3rd District Representative', 2020, 1),
-('Senator from Missouri', 2020, 2),
-('Ohio 1st District Representative', 2016, 3),
-('Ohio 3rd District Representative', 2020, 4),
-('Governor of Ohio', 2020, 5)
+('Ohio 3rd District Representative', 2020, 1, '847364857'),
+('Senator from Missouri', 2020, 2, '047630571'),
+('Ohio 1st District Representative', 2016, 3, '847364857'),
+('Ohio 3rd District Representative', 2020, 4, '958305816'),
+('Governor of Ohio', 2020, 5, '024836182')
 ]
 
 runsOn = [
@@ -113,7 +113,7 @@ cursor.executemany('INSERT INTO Ballot VALUES (%s, %s, %s, %s, %s)', ballots)
 cursor.executemany('INSERT INTO Candidate VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', candidates)
 cursor.executemany('INSERT INTO ConstituentOf VALUES (%s, %s, %s, %s)', constituents)
 cursor.executemany('INSERT INTO LocatedIn VALUES (%s, %s, %s, %s)', locatedIn)
-cursor.executemany('INSERT INTO Casts VALUES (%s, %s, %s)', casts)
+cursor.executemany('INSERT INTO Casts VALUES (%s, %s, %s, %s)', casts)
 cursor.executemany('INSERT INTO RunsOn VALUES (%s, %s, %s, %s, %s)', runsOn)
 connection.commit()
 
