@@ -14,7 +14,7 @@ cursor = connection.cursor()
 
 
 def Create_Voter(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party):
-    sql_command = f"""INSERT INTO Voter VALUES ("{SSN}", "{first_name}", "{middle_name}", "{last_name}", "{birthday}", "{gender}", "{ethnicity}", {income}, "{party}");"""
+    sql_command = f"""INSERT INTO Voter VALUES ({SSN}, {name_first}, {name_middle}, {name_last}, {birthday}, {gender}, {ethnicity}, {income}, {party});"""
     status = execute(sql_command)
     if status:
         print(f"Voter with SSN {SSN} has been created")
@@ -31,7 +31,7 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
         votes.append(cand_vote)
 
     # Insert record into Ballot
-    sql_command = f"""INSERT INTO Ballot VALUES ({ID}, "{position}", {year}, "{submission_time}", {absentee});"""
+    sql_command = f"""INSERT INTO Ballot VALUES ({ID}, {position}, {year}, {submission_time}, {absentee});"""
     status = execute(sql_command)
     if status:
         print(f"Ballot with ID {ID} has been created")
@@ -39,7 +39,7 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
     # Insert records into RunsOn
     votes = [re.split(r'\s+', cand_vote) for cand_vote in votes]
     for v in votes:
-        sql_command = f"""INSERT INTO RunsOn VALUES ("{position}", {year}, "{v[0]}", {ID}, {v[1]});"""
+        sql_command = f"""INSERT INTO RunsOn VALUES ({position}, {year}, "{v[0]}", {ID}, {v[1]});"""
         status = execute(sql_command)
         if status:
             print(f"Vote on candidate {v[0]} has been recorded")
@@ -47,7 +47,7 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
 
 def Update_Voter(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party):
     # Check if given SSN exists
-    sql_command = f"""SELECT * FROM Voter WHERE Voter.SSN = "{SSN}";"""
+    sql_command = f"""SELECT * FROM Voter WHERE Voter.SSN = {SSN};"""
     execute(sql_command)
     matches = cursor.fetchall()
     if not matches:
@@ -57,16 +57,16 @@ def Update_Voter(SSN, name_first, name_middle, name_last, birthday, gender, ethn
     # Get all updated attributes
     attr_names = inspect.getfullargspec(Update_Voter)[0]
     updated_attributes = zip(attr_names, [SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party])
-    updated_attribute_strings = [f'{attr[0]} = "{attr[1]}"' for attr in updated_attributes if attr[1]]
+    updated_attribute_strings = [f"{attr[0]} = {attr[1]}" for attr in updated_attributes if attr[1]]
 
-    sql_command = f"""UPDATE Voter SET {','.join(updated_attribute_strings)} WHERE SSN = "{SSN}";"""
+    sql_command = f"""UPDATE Voter SET {','.join(updated_attribute_strings)} WHERE SSN = {SSN};"""
     status = execute(sql_command)
     if status:
         print(f"Voter with SSN {SSN} updated")
 
 
 def Update_Candidate(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, party):
-    sql_command = f"""SELECT * FROM Candidate WHERE Candidate.SSN = "{SSN}";"""
+    sql_command = f"""SELECT * FROM Candidate WHERE Candidate.SSN = {SSN};"""
     execute(sql_command)
     matches = cursor.fetchall()
     if not matches:
@@ -76,17 +76,17 @@ def Update_Candidate(SSN, name_first, name_middle, name_last, birthday, gender, 
     # Get all updated attributes
     attr_names = inspect.getfullargspec(Update_Candidate)[0]
     updated_attributes = zip(attr_names, [SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, party])
-    updated_attribute_strings = [f'{attr[0]} = "{attr[1]}"' for attr in updated_attributes if attr[1]]
+    updated_attribute_strings = [f"{attr[0]} = {attr[1]}" for attr in updated_attributes if attr[1]]
     print(updated_attribute_strings)
 
-    sql_command = f"""UPDATE Candidate SET {','.join(updated_attribute_strings)} WHERE SSN = "{SSN}";"""
+    sql_command = f"""UPDATE Candidate SET {','.join(updated_attribute_strings)} WHERE SSN = {SSN};"""
     status = execute(sql_command)
     if status:
         print(f"Candidate with SSN {SSN} updated")
 
 
 def Find_Candidates(position, year):
-    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position = "{position}" AND RunsOn.year = {year};"""
+    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position = {position} AND RunsOn.year = {year};"""
     execute(sql_command)
     return cursor
 
@@ -95,7 +95,7 @@ def Find_Election_Winner(position, year):
     sql_command = f"""
     SELECT SUM(RunsOn.vote_for), Candidate.name_first, Candidate.name_last, Candidate.party
     FROM Candidate NATURAL JOIN RunsOn
-    WHERE RunsOn.position = "{position}" AND RunsOn.year = {year}
+    WHERE RunsOn.position = {position} AND RunsOn.year = {year}
     GROUP BY Candidate.SSN
     ORDER BY SUM(RunsOn.vote_for) DESC;
     """
@@ -104,9 +104,9 @@ def Find_Election_Winner(position, year):
 
 
 def Participation_Rate(position, year, number, state):
-    sql_command = f"""SELECT COUNT(*) / (SELECT MAX(d.population) FROM District d WHERE d.year = {year} AND d.number = {number} AND d.state = "{state}")
+    sql_command = f"""SELECT COUNT(*) / (SELECT MAX(d.population) FROM District d WHERE d.year = {year} AND d.number = {number} AND d.state = {state})
     FROM LocatedIn l NATURAL JOIN Ballot b
-    WHERE l.position = "{position}" AND l.year = {year} AND l.number = {number} AND l.state = "{state}";"""
+    WHERE l.position = {position} AND l.year = {year} AND l.number = {number} AND l.state = {state};"""
     execute(sql_command)
     return cursor
 
@@ -132,9 +132,9 @@ def attribute_values(method):
     for p in parameters:
         attr = input(p + ': ')
         if attr:
-            values.append(attr)
+            values.append(f'"{attr}"')
         else:
-            values.append(None)
+            values.append('NULL')
     return values
 
 
@@ -146,6 +146,7 @@ Any attribute values left blank will be NULL in the database.
 Update_*:
 Enter relevant attribute values when prompted.
 Any attribute values left blank will remain the same as before.
+However, non-null attributes must be re-entered.
 
 Custom_Query:
 Enter a valid SQL query command.
@@ -156,14 +157,14 @@ Enter Ctrl+C to abort all changes and exit program.
 """
 
 options = {
-    1: Create_Voter,
-    2: Create_Ballot,
-    3: Update_Voter,
-    4: Update_Candidate,
-    5: Find_Candidates, #('Senator from Missouri', 2020)
-    6: Find_Election_Winner,
-    7: Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
-    8: Custom_Query
+    '1': Create_Voter,
+    '2': Create_Ballot,
+    '3': Update_Voter,
+    '4': Update_Candidate,
+    '5': Find_Candidates, #('Senator from Missouri', 2020)
+    '6': Find_Election_Winner,
+    '7': Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
+    '8': Custom_Query
 }
 
 # Main program loop
@@ -173,23 +174,20 @@ while True:
         print(f'{key}. {options[key].__name__}')
     print('9. Help')
     print('0. Save & Exit')
-    choice = int(input('> '))
+    choice = input('> ')
 
-    if choice == 9:
+    if choice == '9':
         print(help_info)
-        continue
-    elif choice == 0:
+    elif choice == '0':
         break
     elif choice not in options:
         print('Not a valid option.')
-        continue
-
-    # Call corresponding method and print results if applicable
-    method = options[choice]
-    result = getattr(sys.modules[__name__], method.__name__)(*attribute_values(method))
-    if result:
-        for t in result:
-            print(t)
+    else: # Call corresponding method and print results if applicable
+        method = options[choice]
+        result = getattr(sys.modules[__name__], method.__name__)(*attribute_values(method))
+        if result:
+            for t in result:
+                print(t)
     print('------------------------------')
 
 # close the connection
