@@ -31,6 +31,17 @@ cursor.execute(sql_command)
 for y, m, d in cursor:
     print(y, m, d)
 
+
+def Find_Candidates(position, year):
+    sql_command = f"""SELECT Candidate.SSN, Candidate.name, Candidates.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position  = {position} AND RunsOn.year = {year}"""
+    candidates = cursor.execute(sql_command)
+    return candidates
+
+def Create_Voter(SSN, name, birthday, gender, ethnicity, income, party):
+    sql_command = f"""INSERT INTO Voter VALUES ({SSN}, {name}, {birthday}, {gender}, {ethnicity}, {income}, {party})"""
+    cursor.execute(sql_command)
+    print(f"Voter {name} has been created")
+
 # To save the changes in the files. Never skip this.
 # If we skip this, nothing will be saved in the database.
 connection.commit()
