@@ -13,7 +13,7 @@ connection = driver.connect(user=user, password=passwd, database=db_name)
 cursor = connection.cursor()
 
 
-def Create_Voter(SSN, first_name, middle_name, last_name, birthday, gender, ethnicity, income, party):
+def Create_Voter(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party):
     sql_command = f"""INSERT INTO Voter VALUES ("{SSN}", "{first_name}", "{middle_name}", "{last_name}", "{birthday}", "{gender}", "{ethnicity}", {income}, "{party}");"""
     status = execute(sql_command)
     if status:
@@ -45,27 +45,44 @@ def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
             print(f"Vote on candidate {v[0]} has been recorded")
 
 
-def Update_Voter(SSN: str, first_name=None, middle_name=None, last_name=None, birthday=None, gender=None, ethnicity=None, income=None, party=None):
-    atrs = [first_name, middle_name, last_name, birthday, gender, ethnicity, income, party]
+def Update_Voter(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party):
+    # Check if given SSN exists
     sql_command = f"""SELECT * FROM Voter WHERE Voter.SSN = "{SSN}";"""
     execute(sql_command)
-    for idx, a in enumerate(atrs):
-        if a is None:
-            a = cursor[idx]
-            atrs[idx] = a
+    matches = cursor.fetchall()
+    if not matches:
+        print(f"Voter with SSN {SSN} was not found")
+        return None
+
+    # Get all updated attributes
+    attr_names = inspect.getfullargspec(Update_Voter)[0]
+    updated_attributes = zip(attr_names, [SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, income, party])
+    updated_attribute_strings = [f'{attr[0]} = "{attr[1]}"' for attr in updated_attributes if attr[1]]
+
+    sql_command = f"""UPDATE Voter SET {','.join(updated_attribute_strings)} WHERE SSN = "{SSN}";"""
+    status = execute(sql_command)
+    if status:
+        print(f"Voter with SSN {SSN} updated")
 
 
-    sql_command = f"""UPDATE Voter 
-    SET Voter.name_first = "{atrs[0]}", 
-    Voter.name_middle = "{atrs[1]}", 
-    Voter.name_last = "{atrs[2]}", 
-     
-    WHERE Voter.SSN = "{SSN}";"""
-    pass
+def Update_Candidate(SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, party):
+    sql_command = f"""SELECT * FROM Candidate WHERE Candidate.SSN = "{SSN}";"""
+    execute(sql_command)
+    matches = cursor.fetchall()
+    if not matches:
+        print(f"Candidate with SSN {SSN} was not found")
+        return None
 
+    # Get all updated attributes
+    attr_names = inspect.getfullargspec(Update_Candidate)[0]
+    updated_attributes = zip(attr_names, [SSN, name_first, name_middle, name_last, birthday, gender, ethnicity, party])
+    updated_attribute_strings = [f'{attr[0]} = "{attr[1]}"' for attr in updated_attributes if attr[1]]
+    print(updated_attribute_strings)
 
-def Update_Candidate():
-    pass
+    sql_command = f"""UPDATE Candidate SET {','.join(updated_attribute_strings)} WHERE SSN = "{SSN}";"""
+    status = execute(sql_command)
+    if status:
+        print(f"Candidate with SSN {SSN} updated")
 
 
 def Find_Candidates(position, year):
