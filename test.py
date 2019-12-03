@@ -1,4 +1,5 @@
 import sys
+import re
 import inspect
 import getpass
 import mysql
@@ -19,17 +20,35 @@ def Find_Candidates(position, year):
 
 
 def Create_Voter(SSN, first_name, middle_name, last_name, birthday, gender, ethnicity, income, party):
-    sql_command = f"""INSERT INTO Voter VALUES ("{SSN}", "{first_name}", "{middle_name}", "{last_name}", "{birthday}", "{gender}", "{ethnicity}", {income}, "{party}")"""
+    sql_command = f"""INSERT INTO Voter VALUES ("{SSN}", "{first_name}", "{middle_name}", "{last_name}", "{birthday}", "{gender}", "{ethnicity}", {income}, "{party}");"""
     status = execute(sql_command)
     if status:
         print(f"Voter with SSN {SSN} has been created")
 
 
-def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee, candidate_SSN):
-    sql_command = f"""INSERT_INTO Ballot VALUES ({ID}, "{position}", {year}, {submission_time}, {absentee})"""
+def Create_Ballot(voter_SSN, ID, position, year, submission_time, absentee):
+    # Read candidates and votes on the ballot
+    votes = []
+    print('(Hit enter without input to stop reading votes for candidates...)')
+    while True:
+        cand_vote = str(input('<candidate_SSN> <vote_for (1 for yes, 0 for no)>: '))
+        if not cand_vote:
+            break
+        votes.append(cand_vote)
+
+    # Insert record into Ballot
+    sql_command = f"""INSERT INTO Ballot VALUES ({ID}, "{position}", {year}, "{submission_time}", {absentee});"""
     status = execute(sql_command)
     if status:
         print(f"Ballot with ID {ID} has been created")
+
+    # Insert records into RunsOn
+    votes = [re.split(r'\s+', cand_vote) for cand_vote in votes]
+    for v in votes:
+        sql_command = f"""INSERT INTO RunsOn VALUES ("{position}", {year}, "{v[0]}", {ID}, {v[1]});"""
+        status = execute(sql_command)
+        if status:
+            print(f"Vote on candidate {v[0]} has been recorded")
 
 
 def Participation_Rate(position, year, number, state):
