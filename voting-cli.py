@@ -102,6 +102,25 @@ def Find_Election_Winner(position, year):
     execute(sql_command)
     return cursor
 
+def Find_Candidates_In_Every_Election_For_Year(year):
+    sql_command = f"""
+    SELECT c.SSN FROM Candidate c WHERE NOT EXISTS(
+    (SELECT e.position, e.year FROM Election e WHERE e.year = {year}) EXCEPT 
+    (SELECT r.year, r.position FROM RunsOn r WHERE c.SSN = r.SSN));
+    """
+    execute(sql_command)
+    return cursor
+
+def Voters_Voted_In_Every_year():
+    sql_command = f"""
+    SELECT v.SSN FROM Voter AS v WHERE NOT EXISTS (
+    (SELECT Election.year FROM Election) EXCEPT
+    (SELECT year FROM Casts NATURAL JOIN Ballot WHERE 
+    Casts.SSN = v.SSN));
+    """
+    execute(sql_command)
+    return cursor
+
 
 def Participation_Rate(position, year, number, state):
     sql_command = f"""SELECT COUNT(*) / (SELECT MAX(d.population) FROM District d WHERE d.year = {year} AND d.number = {number} AND d.state = {state})
@@ -164,7 +183,9 @@ options = {
     '5': Find_Candidates, #('Senator from Missouri', 2020)
     '6': Find_Election_Winner,
     '7': Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
-    '8': Custom_Query
+    '8': Find_Candidates_In_Every_Election_For_Year,
+    '9': Voters_Voted_In_Every_Year,
+    '10': Custom_Query
 }
 
 # Main program loop
