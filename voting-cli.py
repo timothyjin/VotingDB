@@ -86,7 +86,10 @@ def Update_Candidate(SSN, name_first, name_middle, name_last, birthday, gender, 
 
 
 def Find_Candidates(position, year):
-    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party FROM Candidate NATURAL JOIN RunsOn WHERE RunsOn.position = {position} AND RunsOn.year = {year};"""
+    sql_command = f"""SELECT Candidate.SSN, Candidate.name_first, Candidate.name_last, Candidate.party
+    FROM Candidate NATURAL JOIN RunsOn
+    WHERE RunsOn.position = {position} AND RunsOn.year = {year};
+    """
     execute(sql_command)
     return cursor
 
@@ -105,17 +108,17 @@ def Find_Election_Winner(position, year):
 def Find_Candidates_In_Every_Election_For_Year(year):
     sql_command = f"""
     SELECT c.SSN FROM Candidate c WHERE NOT EXISTS(
-    (SELECT e.position, e.year FROM Election e WHERE e.year = {year}) EXCEPT 
+    (SELECT e.position, e.year FROM Election e WHERE e.year = {year}) EXCEPT
     (SELECT r.year, r.position FROM RunsOn r WHERE c.SSN = r.SSN));
     """
     execute(sql_command)
     return cursor
 
-def Voters_Voted_In_Every_year():
+def Voters_Voted_In_Every_Year():
     sql_command = f"""
     SELECT v.SSN FROM Voter AS v WHERE NOT EXISTS (
     (SELECT Election.year FROM Election) EXCEPT
-    (SELECT year FROM Casts NATURAL JOIN Ballot WHERE 
+    (SELECT year FROM Casts NATURAL JOIN Ballot WHERE
     Casts.SSN = v.SSN));
     """
     execute(sql_command)
@@ -123,9 +126,12 @@ def Voters_Voted_In_Every_year():
 
 
 def Participation_Rate(position, year, number, state):
-    sql_command = f"""SELECT COUNT(*) / (SELECT MAX(d.population) FROM District d WHERE d.year = {year} AND d.number = {number} AND d.state = {state})
+    sql_command = f"""SELECT COUNT(*) / (SELECT MAX(d.population)
+        FROM District d
+        WHERE d.year = {year} AND d.number = {number} AND d.state = {state})
     FROM LocatedIn l NATURAL JOIN Ballot b
-    WHERE l.position = {position} AND l.year = {year} AND l.number = {number} AND l.state = {state};"""
+    WHERE l.position = {position} AND l.year = {year} AND l.number = {number} AND l.state = {state};
+    """
     execute(sql_command)
     return cursor
 
@@ -171,35 +177,40 @@ Custom_Query:
 Enter a valid SQL query command.
 The results of that query will be displayed.
 
-Enter 0 to save all changes and exit program.
-Enter Ctrl+C to abort all changes and exit program.
+Enter wq to save all changes and exit program.
+Enter q or Ctrl+C to abort all changes and exit program.
 """
 
 options = {
-    '1': Create_Voter,
-    '2': Create_Ballot,
-    '3': Update_Voter,
-    '4': Update_Candidate,
-    '5': Find_Candidates, #('Senator from Missouri', 2020)
-    '6': Find_Election_Winner,
-    '7': Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
-    '8': Find_Candidates_In_Every_Election_For_Year,
-    '9': Voters_Voted_In_Every_Year,
-    '10': Custom_Query
+    'cv': Create_Voter,
+    'cb': Create_Ballot,
+    'uv': Update_Voter,
+    'uc': Update_Candidate,
+    'fc': Find_Candidates, #('Senator from Missouri', 2020)
+    'fw': Find_Election_Winner,
+    'pr': Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
+    'cee': Find_Candidates_In_Every_Election_For_Year,
+    'vey': Voters_Voted_In_Every_Year,
+    'c': Custom_Query
 }
 
 # Main program loop
+commit = False
 while True:
 
     for key in options:
         print(f'{key}. {options[key].__name__}')
-    print('9. Help')
-    print('0. Save & Exit')
+    print('h. Help')
+    print('q. Exit')
+    print('wq. Save & Exit')
     choice = input('> ')
 
-    if choice == '9':
+    if choice == 'h':
         print(help_info)
-    elif choice == '0':
+    elif choice == 'q':
+        break
+    elif choice == 'wq':
+        commit = True
         break
     elif choice not in options:
         print('Not a valid option.')
@@ -208,10 +219,11 @@ while True:
         result = getattr(sys.modules[__name__], method.__name__)(*attribute_values(method))
         if result:
             for t in result:
-                print(t)
+                print(', '.join([str(e) for e in t]))
     print('------------------------------')
 
-# close the connection
-connection.commit()
+# Commit changes if necessary, then close the connection
+if commit:
+    connection.commit()
 connection.close()
 print('Bye')
