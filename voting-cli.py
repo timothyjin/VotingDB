@@ -105,19 +105,10 @@ def Find_Election_Winner(position, year):
     execute(sql_command)
     return cursor
 
-def Find_Candidates_In_Every_Election_For_Year(year):
-    sql_command = f"""
-    SELECT c.SSN FROM Candidate c WHERE NOT EXISTS(
-    (SELECT e.position, e.year FROM Election e WHERE e.year = {year}) EXCEPT
-    (SELECT r.year, r.position FROM RunsOn r WHERE c.SSN = r.SSN));
-    """
-    execute(sql_command)
-    return cursor
-
 def Voters_Voted_In_Every_Year():
     sql_command = f"""
     SELECT v.SSN FROM Voter AS v WHERE NOT EXISTS (
-    (SELECT Election.year FROM Election) EXCEPT
+    SELECT Election.year FROM Election WHERE Election.year NOT IN
     (SELECT year FROM Casts NATURAL JOIN Ballot WHERE
     Casts.SSN = v.SSN));
     """
@@ -173,6 +164,10 @@ Enter relevant attribute values when prompted.
 Any attribute values left blank will remain the same as before.
 However, non-null attributes must be re-entered.
 
+Voters_Voted_In_Every_Election:
+This query uses NOT IN instead of EXCEPT due to the constraints
+of MySQL. The EXCEPT version is supplied in the final report.
+
 Custom_Query:
 Enter a valid SQL query command.
 The results of that query will be displayed.
@@ -189,7 +184,6 @@ options = {
     'fc': Find_Candidates, #('Senator from Missouri', 2020)
     'fw': Find_Election_Winner,
     'pr': Participation_Rate, #('Ohio 3rd District Representative', 2020, 3, 'OH'):
-    'cee': Find_Candidates_In_Every_Election_For_Year,
     'vey': Voters_Voted_In_Every_Year,
     'c': Custom_Query
 }
